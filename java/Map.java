@@ -83,11 +83,15 @@ public class Map extends Base {
 			base += '\n';
 		}
 
-		int s = this.size + 1;
+		int[] count = new int[]{0, 0, 0};
+		
+		int s = this.size + 1, side = -1;
 		StringBuilder image = new StringBuilder(base);
 		for(Object i : entity) {
 			if(i instanceof Nexus) {
 				Nexus n = (Nexus)i;
+				count[0] += 1;
+				side = n.side;
 				image.setCharAt((Math.round(n.y) * s) + Math.round(n.x), 'n');
 			}
 			
@@ -107,19 +111,30 @@ public class Map extends Base {
 			
 			if(i instanceof Worker) {
 				Worker a = (Worker)i;
+				count[1] += 1;
 				image.setCharAt((Math.round(a.y) * s) + Math.round(a.x), 'a');
 			}
 
 			if(i instanceof Warrior) {
 				Warrior a2 = (Warrior)i;
+				count[2] += 1;
 				image.setCharAt((Math.round(a2.y) * s) + Math.round(a2.x), 'x');
 			}
 		}
 
+		log.write("log/game", "count Nexus " + count[0]);
+		log.write("log/game", "count Worker " + count[1]);
+		log.write("log/game", "count Warrior " + count[2]);
 		log.write("log/game", "Draw frame " + frame);
 		log.write("log/game", image.toString());
 		System.out.print(image);
 
+		if (count[0] == 1) {
+			System.out.print(side + " has won the match");
+			log.write("log/game", side + " has won the match");
+			return (false);
+		}
+		
 		frame -= 1;
 		return (frame > 0);
 	}

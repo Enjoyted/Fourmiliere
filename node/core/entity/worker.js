@@ -8,6 +8,7 @@ var obj = function(map, config) {
         y: config.y || 0
     };
     this.health = 10;
+	this.age = 0;
     this.pulse = 0;
     this.nexus = config.nexus;
     this.side = config.side;
@@ -18,6 +19,16 @@ obj.prototype = require(appRoot + '/core/lib/extends.js')(require(appRoot + '/co
 
         this.nexus.health += 1;
 
+		if (this.age > 500) {
+			for (var i in this.map.entity) {
+                if (this.map.entity[i] == this) {
+					this.map.entity.splice(i, 1);
+                    return;
+                }
+            }
+		}
+		this.age += 1;
+		
         var ws = (this.nexus.food / this.nexus.water), cord = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
         var score = 0, next = null, type = '';

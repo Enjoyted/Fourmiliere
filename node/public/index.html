@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+	<head>
+		<style type="text/css">
+			body, html {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+		<script>
+			var draw = function() {		
+				(function() {
+					var lastTime = 0;
+					var vendors = ['ms', 'moz', 'webkit', 'o'];
+					for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+						window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+						window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+												   || window[vendors[x]+'CancelRequestAnimationFrame'];
+					}
+
+					if (!window.requestAnimationFrame)
+						window.requestAnimationFrame = function(callback, element) {
+							var currTime = new Date().getTime();
+							var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+							var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+							  timeToCall);
+							lastTime = currTime + timeToCall;
+							return id;
+						};
+
+					if (!window.cancelAnimationFrame)
+						window.cancelAnimationFrame = function(id) {
+							clearTimeout(id);
+						};
+				}());
+
+				
+				var data = {}, last = 0, color = {
+					food0: 'rgba(255, 0, 0, ',
+					food1: 'rgba(0, 255, 0, ',
+					water0: 'rgba(255, 0, 255, ',
+					water1: 'rgba(255, 255, 0, ',
+					nexus_0: 'rgba(0, 255, 255, ',
+					nexus_1: 'rgba(0, 0, 0, '
+				}, eColor = {
+					water: 'rgb(255, 0, 0)',
+					nexus: 'rgb(0, 255, 0)',
+					food: 'rgb(255, 0, 255)',
+					worker: 'rgb(255, 255, 0)',
+					warrior: 'rgb(0, 255, 255)'
+				};
+				var update = function() {
+					try {
+						var canvas = document.getElementById('canvas');
+						canvas.width = document.body.clientWidth;
+						canvas.height = document.body.clientHeight;
+						var ctx = canvas.getContext('2d');
+
+						if (data.heat) {
+							var key = [];
+							for (var i in data.heat) {
+								key.push(i);
+							}
+
+							for (var r = 0; r < 3; r++) {
+								var i = key[Math.floor(Math.random() * key.length)];
+								for (var x in data.heat[i]) {
+									for (var y in data.heat[i][x]) {
+										ctx.fillStyle = color[i] + Math.min(1, data.heat[i][x][y] / 30) + ')';
+										ctx.fillRect(x * 20, y * 20, 20, 20);
+									}
+								}
+							}
+						}
+
+						if (data.entity) {
+							for (var i in data.entity) {
+								ctx.fillStyle = (data.entity[i].side) ? 'gray' : 'black';
+								ctx.fillRect(data.entity[i].pos.x * 20, data.entity[i].pos.y * 20, 20, 20);
+								ctx.fillStyle = eColor[data.entity[i].type];
+								ctx.fillRect((data.entity[i].pos.x * 20) + 4, (data.entity[i].pos.y * 20) + 4, 12, 12);
+							}
+						}
+					} catch (e) {
+						// don't care
+					}
+
+					window.requestAnimationFrame(update);
+				};
+				update();
+
+				var ws = new WebSocket('ws://' + window.location.hostname + ':8080');
+				ws.onopen = function (event) {
+					ws.send('getALL');
+					
+					ws.onmessage = function(evt) {
+						data = JSON.parse(evt.data);
+					};
+				}
+			};
+		</script>
+	</head>
+	<body onload="draw()">
+		<canvas id="canvas" style="width:100%;height:100%"></canvas>
+	</body>
+</html>

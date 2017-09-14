@@ -100,9 +100,12 @@ map.prototype = {
             nexus1: '2'
         }, count = {};
         for (var i in this.entity) {
-            var k = this.entity[i].type + (this.entity[i].side || '');
-            count[k] = (count[k] || 0)+ 1;
-            map[this.entity[i].pos.x][this.entity[i].pos.y] = type[k];
+			var t = (this.entity[i].type == 'food' || this.entity[i].type == 'water');
+			if (!t || (t && this.entity[i].size != 0)) {
+				var k = this.entity[i].type + (this.entity[i].side || '');
+				count[k] = (count[k] || 0)+ 1;
+				map[this.entity[i].pos.x][this.entity[i].pos.y] = type[k];
+			}
         }
         console.log(count);
         for (var i in map) {
