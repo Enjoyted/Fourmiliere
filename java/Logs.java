@@ -23,17 +23,18 @@ public class Logs {
 		return (handle);
 	}
 
-	public void write(String project, String txt) {
+	public Logs write(String project, String txt) {
 		try {
 			FileWriter handle = fileMap.get(project);
 			if (handle == null) {
 				handle = new FileWriter(project, true);
 				fileMap.put(project, handle);
 			}
-			handle.write(txt);
+			handle.write(txt + "\n");
 		} catch (Throwable t) {
 			t.printStackTrace (System.out);				
 		}
+		return (this);
 	}
 	
 	public void close() {

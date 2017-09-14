@@ -1,13 +1,13 @@
 
-public class Entity {
-	public int x;
-	public int y;
+public class Entity extends Base {
+	public float x;
+	public float y;
 	
-	public void nextPos(int speed, int ax, int ay) {
-		double angle = (Math.atan2(ay - this.y, ax - this.x) * 180) / Math.PI;
+	public void nextPos(int speed, float ax, float ay) {
+		double angle = Math.atan2(ay - this.y, ax - this.x);
 		
-		this.x = (int)Math.max(0, Math.min(63, this.x + Math.round(speed * Math.cos(angle))));
-		this.y = (int)Math.max(0, Math.min(63, this.y + Math.round(speed * Math.sin(angle))));
+		this.x = (float)Math.max(0, Math.min(63, this.x + (speed * Math.cos(angle))));
+		this.y = (float)Math.max(0, Math.min(63, this.y + (speed * Math.sin(angle))));
 	}
 	
 	public Boolean think() {
